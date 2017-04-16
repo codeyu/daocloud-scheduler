@@ -22,6 +22,7 @@ def hello(**params):
 @engine.define
 def get_daocloud_app():
     DAOCLOUD_APITOKEN = os.environ.get('DAOCLOUD_APITOKEN')
+    requests.packages.urllib3.disable_warnings()
     result = requests.get('https://openapi.daocloud.io/v1/apps', headers={"Authorization": "token " + DAOCLOUD_APITOKEN})
     data = json.loads(result.text)
     DaoCloudApp = Object.extend('DaoCloudApp')
