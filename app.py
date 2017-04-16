@@ -5,6 +5,7 @@ from datetime import datetime
 from flask import Flask
 from flask import render_template
 from flask_sockets import Sockets
+from leancloud import Object
 from leancloud import Query
 from leancloud import LeanCloudError
 app = Flask(__name__)
