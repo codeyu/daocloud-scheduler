@@ -44,4 +44,23 @@ def get_daocloud_app():
                 dao.save()
             else:
                 raise e
-    return result.text
+    print(result.json())
+
+@engine.define
+def start_if_stop():
+    DAOCLOUD_APITOKEN = os.environ.get('DAOCLOUD_APITOKEN')
+    requests.packages.urllib3.disable_warnings()
+    result = requests.post('https://openapi.daocloud.io/v1/apps', headers={"Authorization": "token " + DAOCLOUD_APITOKEN})
+    data = json.loads(result.text)
+    DaoCloudApp = Object.extend('DaoCloudApp')
+    query = leancloud.Query('DaoCloudApp')
+    for daoapp in data['app']:
+        try:
+            if daoapp['state'] == 'stopped':
+                result = requests.post(
+                    'https://openapi.daocloud.io/v1/apps/{0}/actions/start'.format(daoapp['id']),
+                    headers={"Authorization": "token {token}".format(token=DAOCLOUD_APITOKEN)})
+                print(result.json())
+        except leancloud.LeanCloudError as e:
+            raise e
+    print('OK')
