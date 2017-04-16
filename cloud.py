@@ -26,18 +26,21 @@ def get_daocloud_app():
     data = json.loads(result.text)
     DaoCloudApp = Object.extend('DaoCloudApp')
     query = leancloud.Query('DaoCloudApp')
-    for app in data['app']:
-        query.equal_to("appid", app['id'])
-        dao = query.first()
-        if not dao:
-            dao = DaoCloudApp()
-            dao.set('appid', app['id'])
-            dao.set('name', app['name'])
-            dao.set('state', app['state'])
-            dao.set('last_operated_at', app['last_operated_at'])
+    for daoapp in data['app']:
+        query.equal_to("appid", daoapp['id'])
+        try:
+            dao = query.first()
+            dao.set('state', daoapp['state'])
+            dao.set('last_operated_at', daoapp['last_operated_at'])
             dao.save()
-        else:
-            dao.set('state', app['state'])
-            dao.set('last_operated_at', app['last_operated_at'])
-            dao.save()
+        except leancloud.LeanCloudError as e:
+            if e.code == 101:
+                dao = DaoCloudApp()
+                dao.set('appid', daoapp['id'])
+                dao.set('name', daoapp['name'])
+                dao.set('state', daoapp['state'])
+                dao.set('last_operated_at', daoapp['last_operated_at'])
+                dao.save()
+            else:
+                raise e
     return result.text
