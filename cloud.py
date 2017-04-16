@@ -65,19 +65,21 @@ def start_if_stop():
     for daoapp in data['app']:
         try:
             if daoapp['state'] == 'stopped':
+                print(daoapp['name'] + ' stopped, start...')
                 action_id_text = requests.post(
                     '{0}/{1}/actions/start'.format(base_url, daoapp['id']),
                     headers={"Authorization": token}).text
                 action_id = json.loads(action_id_text)
-                action_result = 'IN_PROCESS'
-                while action_result == 'IN_PROCESS':
+                action_result = 'in_process'
+                while action_result == 'in_process':
                     action_result_text = requests.get(
                         '{0}/{1}/actions/{2}'.format(base_url,
                                                      daoapp['id'], action_id['action_id']),
                         headers={"Authorization": token}).text
                     action_result = json.loads(action_result_text)['state']
+                    print(action_result)
                     time.sleep(5)
-                print(action_result)
+                print(daoapp['name'] + ' ' + action_result)
         except leancloud.LeanCloudError as e:
             raise e
     print('start func OK')
