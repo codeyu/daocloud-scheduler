@@ -2,7 +2,7 @@
 import os
 import json
 import requests
-
+import leancloud
 from leancloud import Engine
 from leancloud import LeanEngineError
 from leancloud import Object
